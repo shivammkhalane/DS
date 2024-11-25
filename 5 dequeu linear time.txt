@@ -1,0 +1,128 @@
+5 implelent a queue using two stack suxch that dqueue operation runs in constant time and dequeue operation runs in linaer time 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a stack node
+struct StackNode {
+    int data;
+    struct StackNode* next;
+};
+
+// Function to create a new stack node
+struct StackNode* createStackNode(int data) {
+    struct StackNode* newNode = (struct StackNode*)malloc(sizeof(struct StackNode));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to check if a stack is empty
+int isEmpty(struct StackNode* top) {
+    return top == NULL;
+}
+
+// Push operation for the stack
+void push(struct StackNode** top, int data) {
+    struct StackNode* newNode = createStackNode(data);
+    newNode->next = *top;
+    *top = newNode;
+}
+
+// Pop operation for the stack
+int pop(struct StackNode** top) {
+    if (isEmpty(*top)) {
+        printf("Stack underflow!\n");
+        return -1;
+    }
+    struct StackNode* temp = *top;
+    int poppedData = temp->data;
+    *top = (*top)->next;
+    free(temp);
+    return poppedData;
+}
+
+// Peek operation for the stack
+int peek(struct StackNode* top) {
+    if (isEmpty(top)) {
+        return -1; // Indicating the stack is empty
+    }
+    return top->data;
+}
+
+// Queue structure using two stacks
+struct Queue {
+    struct StackNode* stack1;
+    struct StackNode* stack2;
+};
+
+// Function to create a queue
+struct Queue* createQueue() {
+    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
+    q->stack1 = NULL;
+    q->stack2 = NULL;
+    return q;
+}
+
+// Enqueue operation (O(1))
+void enqueue(struct Queue* q, int data) {
+    push(&q->stack1, data);
+    printf("Enqueued %d into the queue.\n", data);
+}
+
+// Dequeue operation (O(n))
+int dequeue(struct Queue* q) {
+    if (isEmpty(q->stack2)) {
+        while (!isEmpty(q->stack1)) {
+            push(&q->stack2, pop(&q->stack1));
+        }
+    }
+    if (isEmpty(q->stack2)) {
+        printf("Queue underflow! Cannot dequeue from an empty queue.\n");
+        return -1;
+    }
+    int dequeuedData = pop(&q->stack2);
+    printf("Dequeued %d from the queue.\n", dequeuedData);
+    return dequeuedData;
+}
+
+// Function to display the queue
+void displayQueue(struct Queue* q) {
+    struct StackNode* tempStack1 = q->stack1;
+    struct StackNode* tempStack2 = q->stack2;
+
+    printf("Queue elements: ");
+
+    // Display elements from stack2 (front of the queue)
+    while (tempStack2 != NULL) {
+        printf("%d ", tempStack2->data);
+        tempStack2 = tempStack2->next;
+    }
+
+    // Display elements from stack1 (end of the queue)
+    int tempArray[100], count = 0;
+    while (tempStack1 != NULL) {
+        tempArray[count++] = tempStack1->data;
+        tempStack1 = tempStack1->next;
+    }
+    for (int i = count - 1; i >= 0; i--) {
+        printf("%d ", tempArray[i]);
+    }
+
+    printf("\n");
+}
+
+// Main function
+int main() {
+    struct Queue* queue = createQueue();
+    int choice, value;
+
+    printf("Queue Using Two Stacks:\n");
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Enqueue\n");
+        printf("2. Dequeue\n");
+        printf("3. Display Queue\n");
+        printf("4. Exit\n");
+        printf("Enter your
